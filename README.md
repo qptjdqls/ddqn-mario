@@ -6,7 +6,7 @@ https://github.com/pytorch/tutorials/blob/master/intermediate_source/mario_rl_tu
 
 **Things to remember** <br>
 -[Gym Wrappers](https://www.gymlibrary.dev/content/wrappers/) <br>
-[Chaining previous environment method](https://github.com/pytorch/tutorials/blob/master/intermediate_source/mario_rl_tutorial.py) <br>
+[Chaining previous environment method](https://github.com/pytorch/tutorials/blob/master/intermediate_source/mario_rl_tutorial.py) (chain of responsibility)<br>
 -Usage of ```@torch.no_grad()``` <br>
 
 **Things to improve** <br>
