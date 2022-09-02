@@ -75,14 +75,14 @@ class GrayScaleObservation(gym.ObservationWrapper):
         obs_shape = self.observation_space.shape[:2]
         self.observation_space = Box(low=0, high=255, shape=obs_shape, dtype=np.uint8)
     
-    def permute_orientation(self, observation):
+    def _permute_orientation(self, observation):
         # permute [h, w, c] array to [c, h, w] tensor
         observation = np.transpose(observation, (2, 0, 1))
         observation = torch.tensor(observation.copy(), dtype=torch.float)
         return observation
     
     def observation(self, observation):
-        observation = self.permute_orientation(observation)
+        observation = self._permute_orientation(observation)
         transform = T.Grayscale()
         observation = transform(observation)
         return observation
@@ -119,7 +119,7 @@ his movement in the previous several frames.
 
 # Apply Wrappers to environemnt
 env = SkipFrame(env, skip=4)
-env =GrayScaleObservation(env)
+env = GrayScaleObservation(env)
 env = ResizeObservation(env, shape=84)
 env = FrameStack(env, num_stack=4)
 
@@ -247,6 +247,8 @@ class Mario(Mario):
             action = torch.tensor([action])
             reward = torch.tensor([reward])
             done = torch.tensor([done])
+        
+        self.memory.append((state, next_state, action, reward, done,))
 
     def recall(self):
         # Retrieve a batch of experiences from memory
@@ -299,7 +301,7 @@ class Mario(Mario):
         super().__init__(state_dim , action_dim, save_dir)
         self.gamma = 0.9
 
-    def td_estiamte(self, state, action):
+    def td_estimate(self, state, action):
         current_Q  = self.net(state, model="online")[
             np.arange(0, self.batch_size), action
         ]   # Q_online(s, a)
@@ -318,7 +320,7 @@ class Mario(Mario):
 class Mario(Mario):
     def __init__(self, state_dim, action_dim, save_dir):
         super().__init__(state_dim, action_dim, save_dir)
-        self.optimzier = torch.optim.Adam(self.net.parameters(), lr=0.00025)
+        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
         self.loss_fn = torch.nn.SmoothL1Loss()
 
     def update_Q_online(self, td_estimate, td_target):
@@ -360,6 +362,9 @@ class Mario(Mario):
             self.save()
 
         if self.curr_step < self.burnin:
+            return None, None
+        
+        if self.curr_step % self.learn_every != 0:
             return None, None
 
         # Sample from memory
@@ -492,7 +497,7 @@ mario = Mario(state_dim=(4, 84, 84), action_dim=env.action_space.n, save_dir=sav
 
 logger = MetricLogger(save_dir)
 
-episodes = 10
+episodes = 40000
 for e in range(episodes):
 
     state = env.reset()

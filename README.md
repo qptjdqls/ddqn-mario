@@ -1,21 +1,17 @@
 # ddqn-mario
 
+### Origianl code: <br>
+https://pytorch.org/tutorials/intermediate/mario_rl_tutorial.html <br>
+https://github.com/pytorch/tutorials/blob/master/intermediate_source/mario_rl_tutorial.py <br>
 
-https://teddylee777.github.io/pytorch/pytorch-tutorial-01
+**Things to remember** <br>
+-[Gym Wrappers](https://www.gymlibrary.dev/content/wrappers/) <br>
+[Chaining previous environment method](https://github.com/pytorch/tutorials/blob/master/intermediate_source/mario_rl_tutorial.py) <br>
+-Usage of ```@torch.no_grad()``` <br>
 
-self.net = MarioNet(self.state_dim, self.action_dim).float()
-
-state = state.__array__()
-
-cuda
-
-decrease exploration rate 
-
-state, next_state, action, reward, done = map(torch.stack, zip(*batch))
-
-
-@torch.no_grad()
-
-
-if self.curr_step % self.learn_every != 0:
-            return None, None
+**Things to improve** <br>
+-Abuse copying e.g. ```.copy()```, ```__array__()``` <br>
+-checking CUDA <br>
+-Exploration rate scheduling <br>
+Use $\epsilon = \alpha - e^{\beta -x}$ form instead <br>
+-Logging with Tensorboard
